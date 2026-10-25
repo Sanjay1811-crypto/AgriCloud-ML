@@ -1,0 +1,54 @@
+service: agricloud-ml-backend
+
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: nodejs20.x
+  region: ${opt:region, 'us-east-1'}
+  stage: ${opt:stage, 'prod'}
+  environment:
+    NODE_ENV: production
+    STORAGE_MODE: s3
+    S3_BUCKET_NAME: ${self:custom.bucketName}
+    ML_MODE: real
+    ML_SERVICE_URL: ${env:ML_SERVICE_URL}
+    MONGO_URI: ${env:MONGO_URI}
+    JWT_SECRET: ${env:JWT_SECRET}
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - s3:PutObject
+            - s3:GetObject
+            - s3:DeleteObject
+          Resource: "arn:aws:s3:::${self:custom.bucketName}/*"
+        - Effect: Allow
+          Action:
+            - rekognition:DetectLabels
+          Resource: "*"
+
+custom:
+  bucketName: agricloud-leaf-storage-${self:provider.stage}
+
+functions:
+  api:
+    handler: aws/lambda-handler.handler
+    events:
+      - http:
+          path: /{proxy+}
+          method: ANY
+          cors: true
+
+resources:
+  Resources:
+    LeafUploadsBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${self:custom.bucketName}
+        CorsConfiguration:
+          CorsRules:
+            - AllowedHeaders: ['*']
+              AllowedMethods: [GET, PUT, POST, HEAD]
+              AllowedOrigins: ['*']

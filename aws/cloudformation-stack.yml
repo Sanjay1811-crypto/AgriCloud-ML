@@ -1,0 +1,64 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'AgriCloud-ML: Serverless Plant Pathology and Relabeling Pipeline CloudFormation Stack'
+
+Parameters:
+  EnvironmentName:
+    Type: String
+    Default: 'production'
+    Description: 'Deployment environment name'
+
+Resources:
+  # Amazon S3 Leaf Storage Bucket
+  LeafStorageBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub 'agricloud-leaf-specimens-${AWS::AccountId}-${EnvironmentName}'
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        IgnorePublicAcls: true
+        BlockPublicPolicy: false
+        RestrictPublicBuckets: false
+      CorsConfiguration:
+        CorsRules:
+          - AllowedOrigins: ['*']
+            AllowedMethods: [GET, PUT, POST, HEAD]
+            AllowedHeaders: ['*']
+
+  # Amazon Cognito User Pool for Authentication
+  AgriCloudUserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName: !Sub 'agricloud-users-${EnvironmentName}'
+      AutoVerifiedAttributes:
+        - email
+      UsernameAttributes:
+        - email
+      Policies:
+        PasswordPolicy:
+          MinimumLength: 8
+          RequireLowercase: true
+          RequireNumbers: true
+          RequireUppercase: false
+          RequireSymbols: false
+
+  AgriCloudUserPoolClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      ClientName: !Sub 'agricloud-web-client-${EnvironmentName}'
+      UserPoolId: !Ref AgriCloudUserPool
+      GenerateSecret: false
+      ExplicitAuthFlows:
+        - ALLOW_USER_SRP_AUTH
+        - ALLOW_REFRESH_TOKEN_AUTH
+        - ALLOW_USER_PASSWORD_AUTH
+
+Outputs:
+  BucketName:
+    Description: 'S3 Bucket for plant pathology specimens'
+    Value: !Ref LeafStorageBucket
+  UserPoolId:
+    Description: 'Cognito User Pool ID'
+    Value: !Ref AgriCloudUserPool
+  UserPoolClientId:
+    Description: 'Cognito User Pool App Client ID'
+    Value: !Ref AgriCloudUserPoolClient

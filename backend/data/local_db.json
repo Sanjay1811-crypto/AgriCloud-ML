@@ -1,0 +1,369 @@
+{
+  "users": [
+    {
+      "_id": "usr_1788846833875ycx1c",
+      "name": "Sanjay Prabhakar",
+      "email": "sanjay.prabhakar@agricloud.ai",
+      "password": "$2a$10$.mZI/Fyrde5IESHFKTLGd.QzF81T/cMPHuHHyv2zbgpjkcG1NZCcC",
+      "role": "user",
+      "createdAt": "2026-09-08T05:53:53.875Z",
+      "updatedAt": "2026-09-08T05:53:53.875Z"
+    },
+    {
+      "_id": "usr_178884759953663vk5",
+      "name": "Dr. Prabhakara Sanjay",
+      "email": "researcher_1788847599293@agricloud.ai",
+      "password": "$2a$10$0.x.bED3nf9N93.CvaOsmuvSK9e3700MomSbTpXZrVG8okBbQj61u",
+      "role": "user",
+      "createdAt": "2026-09-08T06:06:39.536Z",
+      "updatedAt": "2026-09-08T06:06:39.536Z"
+    },
+    {
+      "_id": "usr_1788847600429i165c",
+      "name": "External Agronomist",
+      "email": "external_1788847600200@agricloud.ai",
+      "password": "$2a$10$u.vlFuqIoVWVlVMCFRp.p.r1T3uWaeOt4S4e5xclGqL2RS3DRpS4i",
+      "role": "user",
+      "createdAt": "2026-09-08T06:06:40.429Z",
+      "updatedAt": "2026-09-08T06:06:40.430Z"
+    },
+    {
+      "_id": "usr_1788848004459f2xgv",
+      "name": "prabhakara sanjay",
+      "email": "prabhakarsanjay1811@gmail.com",
+      "password": "$2a$10$IWpJcklrLT0slKpVcytGy.lJTRlQcl8Ca4FNl1uvaPfJY4FLbSzB6",
+      "role": "user",
+      "createdAt": "2026-09-08T06:13:24.459Z",
+      "updatedAt": "2026-09-08T06:13:24.459Z"
+    },
+    {
+      "_id": "usr_178884982603844zom",
+      "name": "murari",
+      "email": "murari.alapati@gmail.com",
+      "password": "$2a$10$DCBxtd5DPsCpZ04IM4w0pOH83DyZ8zvAwksy0wR1aQRdY.JlIR2vu",
+      "role": "user",
+      "createdAt": "2026-09-08T06:43:46.038Z",
+      "updatedAt": "2026-09-08T06:43:46.038Z"
+    },
+    {
+      "_id": "usr_178893561422558vyb",
+      "name": "sanjau",
+      "email": "sanjaysanju1181@gmail.com",
+      "password": "$2a$10$ZeN4y/kDSEPa0a/svsVYOOB2rpYEqoYSQutugtyZ5pycqSpMNicqS",
+      "role": "user",
+      "createdAt": "2026-09-09T06:33:34.225Z",
+      "updatedAt": "2026-09-09T06:33:34.225Z"
+    },
+    {
+      "_id": "usr_1792915866957p09ly",
+      "name": "Alapati Murari",
+      "email": "xyz.alapati@gmail.com",
+      "password": "$2a$10$TPnMz1RGBbyK2IPYgiixluZvKIyBrdSRo8EnjEOqto41OEwMInSfa",
+      "role": "user",
+      "createdAt": "2026-10-25T08:11:06.957Z",
+      "updatedAt": "2026-10-25T08:11:06.957Z"
+    }
+  ],
+  "analyses": [
+    {
+      "_id": "anl_1788937551740sqyp3",
+      "userId": "usr_1788848004459f2xgv",
+      "originalFilename": "damage-to-plant-leaves-caused-by-ascochyta-fungus-in-a-natural-setting-highlighting-the-effects-of-plant-diseases-on-agriculture-in-early-summer-photo.jpg",
+      "fileType": "image/jpeg",
+      "fileSize": 108725,
+      "storageKey": "1788937551729-876118932f8f6a5522fd7f20.jpg",
+      "storageUrl": "http://localhost:5000/uploads/1788937551729-876118932f8f6a5522fd7f20.jpg",
+      "displayImageUrl": "http://localhost:5000/uploads/1788937551729-876118932f8f6a5522fd7f20.jpg",
+      "status": "completed",
+      "rawClass": "Apple___Cedar_apple_rust",
+      "plantName": "Apple",
+      "predictedDisease": "Cedar Apple Rust",
+      "confidence": 0.897,
+      "confidenceLevel": "High",
+      "topPredictions": [
+        {
+          "label": "Cedar Apple Rust",
+          "confidence": 0.897,
+          "crop": "Apple",
+          "rawClass": "Apple___Cedar_apple_rust"
+        },
+        {
+          "label": "Apple Scab",
+          "confidence": 0.072,
+          "crop": "Apple",
+          "rawClass": "Apple___Apple_scab"
+        },
+        {
+          "label": "Black Rot",
+          "confidence": 0.021,
+          "crop": "Apple",
+          "rawClass": "Apple___Black_rot"
+        }
+      ],
+      "modelVersion": "EfficientNet-B0-v1",
+      "cause": "Gymnosporangium juniperi-virginianae (heteroecious fungus)",
+      "symptoms": "Bright yellow-orange spots on upper leaf surfaces that enlarge and develop raised orange cushions; tube-like structures (aecia) on leaf undersides shedding powdery spores.",
+      "treatment": "Spray sterol inhibitor fungicides (e.g., immunox / myclobutanil) starting at pink bud stage through petal fall.",
+      "prevention": "Remove nearby Eastern Red Cedar (Juniperus virginiana) trees within a 1-2 mile radius if feasible; plant resistant varieties like McIntosh or Red Delicious.",
+      "isHealthy": false,
+      "predictedLabel": "Cedar Apple Rust",
+      "reviewStatus": "Confirmed",
+      "createdAt": "2026-09-09T07:05:51.740Z",
+      "updatedAt": "2026-09-09T07:05:56.969Z",
+      "id": "anl_1788937551740sqyp3",
+      "correctedLabel": "Cedar Apple Rust",
+      "reviewNotes": "Verified diagnosis by agronomist.",
+      "reviewedAt": "2026-09-09T07:05:56.964Z"
+    },
+    {
+      "_id": "anl_1788862885175ipa2g",
+      "userId": "usr_1788848004459f2xgv",
+      "originalFilename": "istockphoto-483451251-612x612.jpg",
+      "fileType": "image/jpeg",
+      "fileSize": 66261,
+      "storageKey": "1788862885169-090c0537f8310174c3a7a7b3.jpg",
+      "storageUrl": "http://localhost:5000/uploads/1788862885169-090c0537f8310174c3a7a7b3.jpg",
+      "displayImageUrl": "http://localhost:5000/uploads/1788862885169-090c0537f8310174c3a7a7b3.jpg",
+      "status": "completed",
+      "rawClass": "Corn_(maize)___Northern_Leaf_Blight",
+      "plantName": "Corn (Maize)",
+      "predictedDisease": "Northern Leaf Blight",
+      "confidence": 0.914,
+      "confidenceLevel": "High",
+      "topPredictions": [
+        {
+          "label": "Northern Leaf Blight",
+          "confidence": 0.914,
+          "crop": "Corn (Maize)",
+          "rawClass": "Corn_(maize)___Northern_Leaf_Blight"
+        },
+        {
+          "label": "Common Rust",
+          "confidence": 0.063,
+          "crop": "Corn (Maize)",
+          "rawClass": "Corn_(maize)___Common_rust_"
+        },
+        {
+          "label": "Gray Leaf Spot",
+          "confidence": 0.018,
+          "crop": "Corn (Maize)",
+          "rawClass": "Corn_(maize)___Cercospora_leaf_spot Gray_leaf_spot"
+        }
+      ],
+      "modelVersion": "EfficientNet-B0-v1",
+      "cause": "Exserohilum turcicum (fungus)",
+      "symptoms": "Long, elliptical, grayish-green or cigar-shaped lesions (1-6 inches long) that mature into dark, olive-black sporulating centers.",
+      "treatment": "Apply triazole or strobilurin-based fungicides at early VT-R1 growth stages if threshold conditions are reached.",
+      "prevention": "Utilize hybrids with Ht-resistance genes; rotate fields with non-host crops; manage residue through tillage where appropriate.",
+      "isHealthy": false,
+      "predictedLabel": "Northern Leaf Blight",
+      "reviewStatus": "Confirmed",
+      "createdAt": "2026-09-08T10:21:25.175Z",
+      "updatedAt": "2026-09-09T06:17:02.835Z",
+      "id": "anl_1788862885175ipa2g",
+      "correctedLabel": "Northern Leaf Blight",
+      "reviewNotes": "Verified diagnosis by agronomist.",
+      "reviewedAt": "2026-09-09T06:17:02.833Z"
+    },
+    {
+      "_id": "anl_1788847600089turnd",
+      "userId": "usr_178884759953663vk5",
+      "originalFilename": "sample_leaf_report.pdf",
+      "fileType": "application/pdf",
+      "fileSize": 963,
+      "storageKey": "1788847600060-df609b4290b40a32cb75b159.pdf",
+      "storageUrl": "http://localhost:5000/uploads/1788847600060-df609b4290b40a32cb75b159.pdf",
+      "displayImageUrl": "http://localhost:5000/uploads/1788847600084-35f1e65ba9481325c5395177.jpg",
+      "status": "completed",
+      "rawClass": "Pepper,_bell___Bacterial_spot",
+      "plantName": "Tomato",
+      "predictedDisease": "Bacterial Spot",
+      "confidence": 0.884,
+      "confidenceLevel": "High",
+      "topPredictions": [
+        {
+          "label": "Bacterial Spot",
+          "confidence": 0.884,
+          "crop": "Pepper (Bell)",
+          "rawClass": "Pepper,_bell___Bacterial_spot"
+        },
+        {
+          "label": "Healthy Pepper (Bell)",
+          "confidence": 0.082,
+          "crop": "Pepper (Bell)",
+          "rawClass": "Pepper,_bell___healthy"
+        },
+        {
+          "label": "Tomato Bacterial Spot",
+          "confidence": 0.024,
+          "crop": "Tomato",
+          "rawClass": "Tomato___Bacterial_spot"
+        }
+      ],
+      "modelVersion": "EfficientNet-B0-v1",
+      "cause": "Phytophthora infestans (oomycete pathogen)",
+      "symptoms": "Large, irregular, water-soaked pale green or brown lesions on leaves; white fluffy mold growth on underside in damp conditions; dark, greasy fruit rot.",
+      "treatment": "Immediately apply systemic fungicides (mandipropamid, cyazofamid, dimethomorph); bag and discard severely infected plants.",
+      "prevention": "Plant resistant cultivars (e.g., Mountain Magic, Defiant); destroy volunteer tomato plants; ensure rapid canopy drying.",
+      "isHealthy": false,
+      "predictedLabel": "Bacterial Spot",
+      "reviewStatus": "Corrected",
+      "createdAt": "2026-09-08T06:06:40.089Z",
+      "updatedAt": "2026-09-08T06:06:40.178Z",
+      "id": "anl_1788847600089turnd",
+      "correctedLabel": "Tomato___Late_blight",
+      "reviewNotes": "Reclassified to Late Blight based on lesion perimeter.",
+      "reviewedAt": "2026-09-08T06:06:40.176Z"
+    },
+    {
+      "_id": "anl_1788847600036a8pha",
+      "userId": "usr_178884759953663vk5",
+      "originalFilename": "sample_leaf.jpg",
+      "fileType": "image/jpeg",
+      "fileSize": 149,
+      "storageKey": "1788847600030-02ac0f8508eaec838cd98294.jpg",
+      "storageUrl": "http://localhost:5000/uploads/1788847600030-02ac0f8508eaec838cd98294.jpg",
+      "displayImageUrl": "http://localhost:5000/uploads/1788847600030-02ac0f8508eaec838cd98294.jpg",
+      "status": "completed",
+      "rawClass": "Pepper,_bell___Bacterial_spot",
+      "plantName": "Pepper (Bell)",
+      "predictedDisease": "Bacterial Spot",
+      "confidence": 0.884,
+      "confidenceLevel": "High",
+      "topPredictions": [
+        {
+          "label": "Bacterial Spot",
+          "confidence": 0.884,
+          "crop": "Pepper (Bell)",
+          "rawClass": "Pepper,_bell___Bacterial_spot"
+        },
+        {
+          "label": "Healthy Pepper (Bell)",
+          "confidence": 0.082,
+          "crop": "Pepper (Bell)",
+          "rawClass": "Pepper,_bell___healthy"
+        },
+        {
+          "label": "Tomato Bacterial Spot",
+          "confidence": 0.024,
+          "crop": "Tomato",
+          "rawClass": "Tomato___Bacterial_spot"
+        }
+      ],
+      "modelVersion": "EfficientNet-B0-v1",
+      "cause": "Xanthomonas campestris pv. vesicatoria (bacterium)",
+      "symptoms": "Small, water-soaked, circular to irregular lesions on foliage turning brownish-black with yellow halos; defoliation leading to fruit sunscald.",
+      "treatment": "Apply fixed copper bactericides combined with mancozeb for improved efficacy; use streptomycin sprays in seedling flats if permitted.",
+      "prevention": "Use certified pathogen-free seeds; avoid overhead sprinkler irrigation; rotate with non-solanaceous crops for a minimum of 2 years.",
+      "isHealthy": false,
+      "predictedLabel": "Bacterial Spot",
+      "reviewStatus": "Confirmed",
+      "createdAt": "2026-09-08T06:06:40.037Z",
+      "updatedAt": "2026-09-08T06:06:40.158Z",
+      "id": "anl_1788847600036a8pha",
+      "correctedLabel": "Bacterial Spot",
+      "reviewNotes": "Pathologist confirmation: clear concentric rings.",
+      "reviewedAt": "2026-09-08T06:06:40.156Z"
+    },
+    {
+      "_id": "anl_1788846936020v76pn",
+      "userId": "usr_1788846833875ycx1c",
+      "originalFilename": "sample_leaf_report.pdf",
+      "fileType": "application/pdf",
+      "fileSize": 963,
+      "storageKey": "1788846935970-3e5aef172d38278830f60ef4.pdf",
+      "storageUrl": "http://localhost:5000/uploads/1788846935970-3e5aef172d38278830f60ef4.pdf",
+      "displayImageUrl": "http://localhost:5000/uploads/1788846935995-c0b651338ba87356395b30f1.jpg",
+      "status": "completed",
+      "rawClass": "Pepper,_bell___Bacterial_spot",
+      "plantName": "Tomato",
+      "predictedDisease": "Bacterial Spot",
+      "confidence": 0.884,
+      "confidenceLevel": "High",
+      "topPredictions": [
+        {
+          "label": "Bacterial Spot",
+          "confidence": 0.884,
+          "crop": "Pepper (Bell)",
+          "rawClass": "Pepper,_bell___Bacterial_spot"
+        },
+        {
+          "label": "Healthy Pepper (Bell)",
+          "confidence": 0.082,
+          "crop": "Pepper (Bell)",
+          "rawClass": "Pepper,_bell___healthy"
+        },
+        {
+          "label": "Tomato Bacterial Spot",
+          "confidence": 0.024,
+          "crop": "Tomato",
+          "rawClass": "Tomato___Bacterial_spot"
+        }
+      ],
+      "modelVersion": "EfficientNet-B0-v1",
+      "cause": "Phytophthora infestans (oomycete pathogen)",
+      "symptoms": "Large, irregular, water-soaked pale green or brown lesions on leaves; white fluffy mold growth on underside in damp conditions; dark, greasy fruit rot.",
+      "treatment": "Immediately apply systemic fungicides (mandipropamid, cyazofamid, dimethomorph); bag and discard severely infected plants.",
+      "prevention": "Plant resistant cultivars (e.g., Mountain Magic, Defiant); destroy volunteer tomato plants; ensure rapid canopy drying.",
+      "isHealthy": false,
+      "predictedLabel": "Bacterial Spot",
+      "reviewStatus": "Corrected",
+      "createdAt": "2026-09-08T05:55:36.020Z",
+      "updatedAt": "2026-09-08T05:55:36.095Z",
+      "id": "anl_1788846936020v76pn",
+      "correctedLabel": "Tomato___Late_blight",
+      "reviewNotes": "Pathologist reclassification: Lesion margin indicates late blight.",
+      "reviewedAt": "2026-09-08T05:55:36.093Z"
+    },
+    {
+      "_id": "anl_1788846935949pm4xk",
+      "userId": "usr_1788846833875ycx1c",
+      "originalFilename": "sample_leaf.jpg",
+      "fileType": "image/jpeg",
+      "fileSize": 149,
+      "storageKey": "1788846935943-b8a8f1f3809fe02b755bd6e3.jpg",
+      "storageUrl": "http://localhost:5000/uploads/1788846935943-b8a8f1f3809fe02b755bd6e3.jpg",
+      "displayImageUrl": "http://localhost:5000/uploads/1788846935943-b8a8f1f3809fe02b755bd6e3.jpg",
+      "status": "completed",
+      "rawClass": "Pepper,_bell___Bacterial_spot",
+      "plantName": "Pepper (Bell)",
+      "predictedDisease": "Bacterial Spot",
+      "confidence": 0.884,
+      "confidenceLevel": "High",
+      "topPredictions": [
+        {
+          "label": "Bacterial Spot",
+          "confidence": 0.884,
+          "crop": "Pepper (Bell)",
+          "rawClass": "Pepper,_bell___Bacterial_spot"
+        },
+        {
+          "label": "Healthy Pepper (Bell)",
+          "confidence": 0.082,
+          "crop": "Pepper (Bell)",
+          "rawClass": "Pepper,_bell___healthy"
+        },
+        {
+          "label": "Tomato Bacterial Spot",
+          "confidence": 0.024,
+          "crop": "Tomato",
+          "rawClass": "Tomato___Bacterial_spot"
+        }
+      ],
+      "modelVersion": "EfficientNet-B0-v1",
+      "cause": "Xanthomonas campestris pv. vesicatoria (bacterium)",
+      "symptoms": "Small, water-soaked, circular to irregular lesions on foliage turning brownish-black with yellow halos; defoliation leading to fruit sunscald.",
+      "treatment": "Apply fixed copper bactericides combined with mancozeb for improved efficacy; use streptomycin sprays in seedling flats if permitted.",
+      "prevention": "Use certified pathogen-free seeds; avoid overhead sprinkler irrigation; rotate with non-solanaceous crops for a minimum of 2 years.",
+      "isHealthy": false,
+      "predictedLabel": "Bacterial Spot",
+      "reviewStatus": "Confirmed",
+      "createdAt": "2026-09-08T05:55:35.949Z",
+      "updatedAt": "2026-09-08T05:55:36.073Z",
+      "id": "anl_1788846935949pm4xk",
+      "correctedLabel": "Bacterial Spot",
+      "reviewNotes": "Verified by Agronomist - Classic early blight symptoms.",
+      "reviewedAt": "2026-09-08T05:55:36.070Z"
+    }
+  ]
+}
