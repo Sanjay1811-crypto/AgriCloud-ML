@@ -43,13 +43,22 @@ class PlantPathologyModel:
     def _load_weights(self, model_path: str):
         if model_path and os.path.exists(model_path):
             try:
-                state_dict = torch.load(model_path, map_location=self.device)
-                self.model.load_state_dict(state_dict)
-                print(f"[ML Service] Loaded weights from {model_path}")
+                checkpoint = torch.load(model_path, map_location=self.device)
+                if isinstance(checkpoint, dict) and "model_state_dict" in checkpoint:
+                    self.model.load_state_dict(checkpoint["model_state_dict"])
+                    if "classes" in checkpoint and len(checkpoint["classes"]) == self.num_classes:
+                        self.classes = checkpoint["classes"]
+                    print(f"[ML Service] Loaded trained weights and classes from Colab checkpoint: {model_path}")
+                elif isinstance(checkpoint, dict):
+                    self.model.load_state_dict(checkpoint)
+                    print(f"[ML Service] Loaded state_dict from: {model_path}")
+                else:
+                    self.model = checkpoint.to(self.device)
+                    print(f"[ML Service] Loaded full model from: {model_path}")
             except Exception as e:
                 print(f"[ML Service] Warning: Failed to load {model_path}: {e}. Running with initialized weights.")
         else:
-            print("[ML Service] No custom .pth found; using base EfficientNet-B0 architecture.")
+            print(f"[ML Service] No custom .pth found at {model_path}; using base EfficientNet-B0 architecture.")
 
     def _evaluate_foliage_density(self, image: Image.Image) -> float:
         """
