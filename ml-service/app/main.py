@@ -18,7 +18,29 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-MODEL_PATH = os.getenv("MODEL_PATH", os.path.join(os.path.dirname(__file__), "..", "..", "model", "model.pth"))
+def resolve_model_path():
+    env_path = os.getenv("MODEL_PATH")
+    if env_path and os.path.exists(env_path):
+        return env_path
+
+    model_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "model"))
+    candidates = [
+        os.path.join(model_dir, "plant_disease_efficientnet_b0.pth"),
+        os.path.join(model_dir, "model.pth")
+    ]
+    for candidate in candidates:
+        if os.path.exists(candidate):
+            return candidate
+
+    # Search for any .pth file in model directory
+    if os.path.exists(model_dir):
+        for fname in os.listdir(model_dir):
+            if fname.lower().endswith(".pth"):
+                return os.path.join(model_dir, fname)
+
+    return os.path.join(model_dir, "plant_disease_efficientnet_b0.pth")
+
+MODEL_PATH = resolve_model_path()
 pathology_model = None
 
 @app.on_event("startup")
@@ -26,7 +48,7 @@ def load_model_instance():
     global pathology_model
     try:
         pathology_model = PlantPathologyModel(MODEL_PATH)
-        print("[ML Service] EfficientNet-B0 inference engine initialized with OOD guardrail.")
+        print(f"[ML Service] EfficientNet-B0 inference engine initialized with weights from: {MODEL_PATH}")
     except Exception as e:
         print(f"[ML Service] Startup notice: {e}")
 
@@ -36,6 +58,8 @@ def health_check():
         "status": "healthy",
         "service": "AgriCloud-ML Inference Engine",
         "model": "EfficientNet-B0",
+        "modelPath": MODEL_PATH,
+        "modelExists": os.path.exists(MODEL_PATH),
         "classesCount": len(CLASS_NAMES),
         "device": str(pathology_model.device) if pathology_model else "uninitialized"
     }

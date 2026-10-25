@@ -8,7 +8,7 @@ echo "=========================================================="
 # 1. Update and install system dependencies
 echo "--> Updating system packages..."
 sudo apt-get update -y
-sudo apt-get install -y curl git nginx build-essential
+sudo apt-get install -y curl git nginx build-essential python3 python3-pip python3-venv
 
 # 2. Install Node.js 20.x
 if ! command -v node &> /dev/null; then
@@ -29,22 +29,37 @@ fi
 APP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 echo "--> Application directory: $APP_DIR"
 
-# 4. Setup Backend
+# 4. Setup Python ML Microservice (FastAPI + PyTorch EfficientNet-B0)
+echo "--> Setting up Python ML Microservice (EfficientNet-B0)..."
+cd "$APP_DIR/ml-service"
+if [ ! -d "venv" ]; then
+    python3 -m venv venv
+fi
+source venv/bin/activate
+pip install --upgrade pip
+echo "--> Installing PyTorch CPU inference engine..."
+pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
+pip install -r requirements.txt
+deactivate
+
+# 5. Setup Backend
 echo "--> Setting up Backend..."
 cd "$APP_DIR/backend"
 if [ ! -f .env ]; then
-    echo "--> Copying .env.example to .env..."
-    cp .env.example .env
+    echo "--> Creating .env from defaults..."
+    cp .env.example .env 2>/dev/null || cp "$APP_DIR/backend/.env" .env
 fi
+# Switch to real ML service mode
+sed -i 's/ML_MODE=mock/ML_MODE=real/g' .env 2>/dev/null || true
 npm install --omit=dev
 
-# 5. Setup and Build Frontend
+# 6. Setup and Build Frontend
 echo "--> Building Frontend..."
 cd "$APP_DIR/frontend"
 npm install
 npm run build
 
-# 6. Configure Nginx
+# 7. Configure Nginx
 echo "--> Configuring Nginx..."
 sudo mkdir -p /var/www/agricloud/frontend
 sudo cp -r "$APP_DIR/frontend/dist" /var/www/agricloud/frontend/
@@ -58,26 +73,32 @@ sudo nginx -t
 sudo systemctl restart nginx
 sudo systemctl enable nginx
 
-# 7. Start Backend with PM2
-echo "--> Starting Backend with PM2..."
+# 8. Start Services with PM2
+echo "--> Starting Python ML Inference Engine with PM2..."
+cd "$APP_DIR/ml-service"
+pm2 delete agricloud-ml 2>/dev/null || true
+pm2 start "venv/bin/python run.py" --name "agricloud-ml"
+
+echo "--> Starting Backend Server with PM2..."
 cd "$APP_DIR/backend"
 pm2 delete agricloud-backend 2>/dev/null || true
 pm2 start server.js --name "agricloud-backend"
 pm2 save
 sudo env PATH=$PATH:/usr/bin pm2 startup systemd -u $USER --hp $HOME 2>/dev/null || true
 
-# 8. Print Completion & Public IP
+# 9. Print Completion & Public IP
 PUBLIC_IP=$(curl -s http://checkip.amazonaws.com || curl -s https://api.ipify.org || echo "YOUR-EC2-PUBLIC-IP")
 
 echo ""
 echo "=========================================================="
 echo "  AgriCloud-ML Deployment Complete! "
 echo "=========================================================="
-echo "  Public URL: http://$PUBLIC_IP"
-echo "  Backend API: http://$PUBLIC_IP/api/health"
+echo "  Public URL:   http://$PUBLIC_IP"
+echo "  Backend API:  http://$PUBLIC_IP/api/health"
+echo "  ML Engine:    http://$PUBLIC_IP:8000/health"
 echo ""
-echo "  Manage Backend:"
+echo "  Manage Services:"
 echo "    pm2 status"
+echo "    pm2 logs agricloud-ml"
 echo "    pm2 logs agricloud-backend"
-echo "    pm2 restart agricloud-backend"
 echo "=========================================================="
