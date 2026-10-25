@@ -14,19 +14,23 @@ import {
   Search,
   Activity,
   ChevronRight,
-  Sparkles
+  Sparkles,
+  Microscope,
+  UploadCloud,
+  Check,
+  UserCheck
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 export default function LandingPage() {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, isExpert } = useAuth();
 
   const features = [
     {
       icon: Cpu,
       title: 'EfficientNet-B0 ML Backbone',
       desc: 'Trained on 54,000+ PlantVillage images with transfer learning, center-cropped 224x224 input, and ImageNet standardization.',
-      tag: '98.72% Val Accuracy'
+      tag: '99.56% Accuracy'
     },
     {
       icon: Layers,
@@ -104,24 +108,24 @@ export default function LandingPage() {
 
               <div className="flex flex-wrap items-center gap-4 pt-2">
                 <Link
-                  to={isAuthenticated ? "/dashboard" : "/signup"}
+                  to={isAuthenticated ? (isExpert ? "/history" : "/dashboard") : "/signup"}
                   className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-sm shadow-md shadow-emerald-800/20 hover:shadow-lg transition-all"
                 >
                   <span>Launch Pathology Pipeline</span>
                   <ArrowRight className="w-4 h-4" />
                 </Link>
                 <a
-                  href="#pipeline"
+                  href="#portals"
                   className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl bg-white hover:bg-stone-100 text-slate-800 font-bold text-sm border border-stone-300 shadow-sm transition-all"
                 >
-                  <span>Explore Architecture</span>
+                  <span>Explore User & Expert Portals</span>
                 </a>
               </div>
 
               {/* Research Metrics Callout */}
               <div className="grid grid-cols-3 gap-4 pt-6 border-t border-stone-200">
                 <div>
-                  <div className="text-2xl font-black text-emerald-700">98.72%</div>
+                  <div className="text-2xl font-black text-emerald-700">99.56%</div>
                   <div className="text-xs text-slate-500 font-medium">Validation Accuracy</div>
                 </div>
                 <div>
@@ -151,7 +155,7 @@ export default function LandingPage() {
                   <div className="p-4 rounded-xl bg-emerald-50/60 border border-emerald-200">
                     <div className="flex items-center justify-between text-xs text-emerald-800 font-semibold mb-1">
                       <span>Detected Pathogen</span>
-                      <span className="px-2 py-0.5 rounded-full bg-emerald-200 text-emerald-900 font-bold">94.2% Conf</span>
+                      <span className="px-2 py-0.5 rounded-full bg-emerald-200 text-emerald-900 font-bold">99.2% Conf</span>
                     </div>
                     <div className="text-lg font-bold text-slate-900">Tomato Early Blight</div>
                     <div className="text-xs text-slate-500 mt-1 italic">Alternaria solani (fungal pathogen)</div>
@@ -160,18 +164,18 @@ export default function LandingPage() {
                   <div className="space-y-2">
                     <div className="flex items-center justify-between text-xs text-slate-600 font-medium">
                       <span>Tomato Early Blight</span>
-                      <span className="font-mono font-bold text-slate-800">94.2%</span>
+                      <span className="font-mono font-bold text-slate-800">99.2%</span>
                     </div>
                     <div className="w-full h-2 bg-stone-100 rounded-full overflow-hidden">
-                      <div className="h-full bg-emerald-600 rounded-full" style={{ width: '94.2%' }}></div>
+                      <div className="h-full bg-emerald-600 rounded-full" style={{ width: '99.2%' }}></div>
                     </div>
 
                     <div className="flex items-center justify-between text-xs text-slate-500">
                       <span>Tomato Late Blight</span>
-                      <span className="font-mono">3.8%</span>
+                      <span className="font-mono">0.6%</span>
                     </div>
                     <div className="w-full h-1.5 bg-stone-100 rounded-full overflow-hidden">
-                      <div className="h-full bg-slate-400 rounded-full" style={{ width: '3.8%' }}></div>
+                      <div className="h-full bg-slate-400 rounded-full" style={{ width: '0.6%' }}></div>
                     </div>
                   </div>
 
@@ -187,12 +191,131 @@ export default function LandingPage() {
                       <CheckCircle2 className="w-3.5 h-3.5" />
                       Relabeling feedback recorded
                     </span>
-                    <span className="font-mono text-slate-400">S3 Stored</span>
+                    <span className="font-mono text-slate-400">Atlas Cloud Synced</span>
                   </div>
                 </div>
               </div>
             </div>
 
+          </div>
+        </div>
+      </section>
+
+      {/* Dual Portal Section: Grower vs Expert */}
+      <section id="portals" className="py-16 sm:py-20 bg-stone-100 border-b border-stone-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center max-w-2xl mx-auto mb-12">
+            <span className="text-xs font-bold tracking-widest text-emerald-700 uppercase">Dual-Role Architecture</span>
+            <h2 className="mt-2 text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
+              Separate Workflows for Farmers & Pathology Experts
+            </h2>
+            <p className="mt-2 text-xs sm:text-sm text-slate-500">
+              Growers receive instant diagnostics and clinical treatments. Certified agronomists inspect all submissions across the platform to verify and correct AI predictions.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+            {/* Farmer Card */}
+            <div className="bg-white rounded-2xl p-6 sm:p-8 border border-stone-200 shadow-soft flex flex-col justify-between hover:border-emerald-500 transition-all">
+              <div>
+                <div className="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center mb-4">
+                  <UploadCloud className="w-6 h-6" />
+                </div>
+                <div className="text-xs font-bold uppercase tracking-wider text-emerald-700">Grower & Farmer Portal</div>
+                <h3 className="text-xl font-black text-slate-900 mt-1">Submit Plant Specimens</h3>
+                <p className="text-xs sm:text-sm text-slate-600 mt-2 leading-relaxed">
+                  Upload high-resolution leaf photography or multi-page pathology PDF reports. Receive instant AI neural classification, botanical causes, and targeted curative treatments.
+                </p>
+
+                <ul className="mt-5 space-y-2.5 text-xs text-slate-700">
+                  <li className="flex items-center gap-2">
+                    <Check className="w-4 h-4 text-emerald-600 flex-shrink-0" />
+                    <span>Upload leaf photos or PDF lab reports</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <Check className="w-4 h-4 text-emerald-600 flex-shrink-0" />
+                    <span>Automated botanical guardrail (rejects non-foliage)</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <Check className="w-4 h-4 text-emerald-600 flex-shrink-0" />
+                    <span>Clinical treatments, causes, and prevention strategies</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <Check className="w-4 h-4 text-emerald-600 flex-shrink-0" />
+                    <span>Track personal diagnostic history</span>
+                  </li>
+                </ul>
+              </div>
+
+              <div className="mt-8 pt-5 border-t border-stone-100 flex items-center gap-3">
+                <Link
+                  to="/login?portal=user"
+                  className="flex-1 text-center py-2.5 px-4 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs shadow-sm transition-colors"
+                >
+                  Farmer Sign In
+                </Link>
+                <Link
+                  to="/signup"
+                  className="py-2.5 px-4 rounded-xl bg-stone-100 hover:bg-stone-200 text-slate-700 font-bold text-xs transition-colors"
+                >
+                  Register
+                </Link>
+              </div>
+            </div>
+
+            {/* Expert Card */}
+            <div className="bg-white rounded-2xl p-6 sm:p-8 border-2 border-emerald-600 shadow-soft flex flex-col justify-between relative overflow-hidden">
+              <div className="absolute top-4 right-4">
+                <span className="px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-900 text-[10px] font-black uppercase tracking-wider">
+                  Cert. Agronomist
+                </span>
+              </div>
+
+              <div>
+                <div className="w-12 h-12 rounded-xl bg-slate-900 text-emerald-400 flex items-center justify-center mb-4">
+                  <Microscope className="w-6 h-6" />
+                </div>
+                <div className="text-xs font-bold uppercase tracking-wider text-emerald-700">Agronomist & Expert Portal</div>
+                <h3 className="text-xl font-black text-slate-900 mt-1">Review All Submissions & Relabel</h3>
+                <p className="text-xs sm:text-sm text-slate-600 mt-2 leading-relaxed">
+                  Inspect images uploaded by <strong>every user</strong>. Confirm accurate predictions or correct pathological classifications using the 38-class diagnostic modal to refine continuous MLOps.
+                </p>
+
+                <ul className="mt-5 space-y-2.5 text-xs text-slate-700">
+                  <li className="flex items-center gap-2">
+                    <Check className="w-4 h-4 text-emerald-600 flex-shrink-0" />
+                    <span><strong>Platform-wide visibility</strong>: View all user uploads</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <Check className="w-4 h-4 text-emerald-600 flex-shrink-0" />
+                    <span>One-click prediction confirmation</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <Check className="w-4 h-4 text-emerald-600 flex-shrink-0" />
+                    <span>Interactive relabeling modal with search across 38 classes</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <Check className="w-4 h-4 text-emerald-600 flex-shrink-0" />
+                    <span>Export verified datasets in COCO JSON & CSV</span>
+                  </li>
+                </ul>
+              </div>
+
+              <div className="mt-8 pt-5 border-t border-stone-100 flex items-center gap-3">
+                <Link
+                  to="/login?portal=expert"
+                  className="flex-1 text-center py-2.5 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs shadow-sm transition-colors"
+                >
+                  Expert Portal Login
+                </Link>
+                <Link
+                  to="/signup"
+                  className="py-2.5 px-4 rounded-xl bg-stone-100 hover:bg-stone-200 text-slate-700 font-bold text-xs transition-colors"
+                >
+                  Expert Apply
+                </Link>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -236,82 +359,126 @@ export default function LandingPage() {
       <section id="pipeline" className="py-16 sm:py-24 bg-stone-50 border-b border-stone-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-16">
-            <h2 className="text-xs font-bold tracking-widest text-emerald-700 uppercase">End-to-End Pipeline</h2>
-            <p className="mt-2 text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
-              How AgriCloud-ML Diagnoses & Improves
-            </p>
-            <p className="mt-3 text-sm text-slate-500">
-              From raw leaf ingestion through neural inference, curation retrieval, and expert feedback capture.
+            <span className="text-xs font-bold tracking-widest text-emerald-700 uppercase">End-to-End Pipeline</span>
+            <h2 className="mt-2 text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
+              From Raw Foliage to Clinically Verified Diagnosis
+            </h2>
+            <p className="mt-3 text-sm sm:text-base text-slate-500">
+              Each specimen travels through an automated preprocessing, inference, and human verification loop.
             </p>
           </div>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-6">
-            {steps.map((step, idx) => (
-              <div key={idx} className="relative p-5 rounded-2xl bg-white border border-stone-200 shadow-sm flex flex-col justify-between">
+          <div className="grid md:grid-cols-5 gap-6">
+            {steps.map((s, i) => (
+              <div key={i} className="p-5 rounded-2xl bg-white border border-stone-200 shadow-soft relative flex flex-col justify-between">
                 <div>
-                  <div className="text-2xl font-black text-emerald-700 mb-2">{step.num}</div>
-                  <h4 className="text-sm font-bold text-slate-900 mb-1.5">{step.title}</h4>
-                  <p className="text-xs text-slate-500 leading-relaxed">{step.desc}</p>
+                  <span className="text-2xl font-black text-emerald-600 font-mono">{s.num}</span>
+                  <h4 className="text-sm font-bold text-slate-900 mt-2 mb-1.5">{s.title}</h4>
+                  <p className="text-xs text-slate-500 leading-relaxed">{s.desc}</p>
                 </div>
-                <div className="mt-4 pt-3 border-t border-stone-100 flex items-center text-[11px] font-semibold text-emerald-600">
-                  <span>Step Verified</span>
-                  <ChevronRight className="w-3.5 h-3.5 ml-auto" />
-                </div>
+                {i < steps.length - 1 && (
+                  <div className="hidden md:block absolute -right-3.5 top-1/2 -translate-y-1/2 z-10 bg-white rounded-full p-1 border border-stone-200 shadow-sm text-slate-400">
+                    <ChevronRight className="w-3.5 h-3.5" />
+                  </div>
+                )}
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Supported Crops Showcase */}
-      <section id="classes" className="py-16 bg-white border-b border-stone-200">
+      {/* 38 Supported Disease Classes Section */}
+      <section id="classes" className="py-16 sm:py-24 bg-white border-b border-stone-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row md:items-end justify-between mb-10">
-            <div>
-              <h2 className="text-xs font-bold tracking-widest text-emerald-700 uppercase">38 Pathology Classes</h2>
-              <p className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight mt-1">
-                Supported Crop Species
-              </p>
-            </div>
-            <p className="text-xs text-slate-500 max-w-md mt-2 md:mt-0">
-              Covering both healthy physiological states and severe fungal, bacterial, viral, and pest infections.
+          <div className="text-center max-w-3xl mx-auto mb-12">
+            <span className="text-xs font-bold tracking-widest text-emerald-700 uppercase">Foliar Spectrum Coverage</span>
+            <h2 className="mt-2 text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
+              14 Crop Families & 38 Pathological Classes
+            </h2>
+            <p className="mt-3 text-sm sm:text-base text-slate-500">
+              Full diagnostic support spanning viral, bacterial, fungal, and physiological conditions across primary staple crops.
             </p>
           </div>
 
-          <div className="flex flex-wrap gap-2.5">
-            {crops.map((crop, i) => (
-              <div key={i} className="px-4 py-2 rounded-xl bg-stone-50 border border-stone-200 hover:border-emerald-400 hover:bg-emerald-50 text-xs font-semibold text-slate-800 transition-colors flex items-center gap-2">
-                <Sprout className="w-3.5 h-3.5 text-emerald-600" />
-                <span>{crop}</span>
-              </div>
+          <div className="flex flex-wrap items-center justify-center gap-2.5 max-w-4xl mx-auto">
+            {crops.map((c, i) => (
+              <span key={i} className="px-4 py-2 rounded-xl bg-stone-100 border border-stone-200 text-xs font-bold text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 hover:border-emerald-300 transition-colors">
+                {c}
+              </span>
             ))}
           </div>
         </div>
       </section>
 
-      {/* CTA Footer */}
-      <section className="py-16 bg-gradient-to-br from-slate-950 via-slate-900 to-emerald-950 text-white mt-auto">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-6">
-          <div className="w-12 h-12 rounded-2xl bg-emerald-600/30 border border-emerald-500/40 text-emerald-400 flex items-center justify-center mx-auto">
-            <Sprout className="w-6 h-6" />
-          </div>
-          <h2 className="text-3xl sm:text-4xl font-black tracking-tight max-w-2xl mx-auto">
-            Ready to Run Plant Pathology Diagnostics?
-          </h2>
-          <p className="text-sm sm:text-base text-slate-400 max-w-xl mx-auto">
-            Sign up now to upload leaf photos or PDF reports, receive instant clinical predictions, and contribute to the relabeling dataset.
-          </p>
-          <div className="pt-2">
-            <Link
-              to="/signup"
-              className="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm shadow-lg shadow-emerald-900/50 transition-all"
-            >
-              <span>Get Started Free</span>
-              <ArrowRight className="w-4 h-4" />
-            </Link>
+      {/* Relabeling Loop Section */}
+      <section id="relabeling" className="py-16 sm:py-24 bg-stone-900 text-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid lg:grid-cols-12 gap-12 items-center">
+            <div className="lg:col-span-7 space-y-6">
+              <span className="text-xs font-bold tracking-widest text-emerald-400 uppercase">Continuous MLOps Flywheel</span>
+              <h2 className="text-3xl sm:text-4xl font-black tracking-tight leading-tight">
+                Defeating Field Dataset Drift with Expert-in-the-Loop Relabeling.
+              </h2>
+              <p className="text-sm sm:text-base text-slate-300 leading-relaxed">
+                When field specimens exhibit ambiguous necrosis or uncommon lesions, certified agronomists inspect the specimen and provide authoritative ground truth. AgriCloud-ML automatically synchronizes verified labels to Amazon S3 for periodic model fine-tuning.
+              </p>
+              <div className="flex flex-wrap gap-4 pt-2">
+                <Link
+                  to="/login?portal=expert"
+                  className="px-5 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold shadow-md transition-colors inline-flex items-center gap-2"
+                >
+                  <Microscope className="w-4 h-4" />
+                  <span>Enter Expert Relabeling Portal</span>
+                </Link>
+                <a
+                  href="/api/analysis/export/relabel?format=json"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="px-5 py-3 rounded-xl bg-stone-800 hover:bg-stone-700 text-slate-200 text-xs font-bold border border-stone-700 transition-colors inline-flex items-center gap-2"
+                >
+                  <span>Download Sample COCO Retraining Set</span>
+                </a>
+              </div>
+            </div>
+
+            <div className="lg:col-span-5 bg-stone-800/80 p-6 sm:p-8 rounded-2xl border border-stone-700 space-y-4">
+              <div className="text-xs font-bold uppercase tracking-wider text-emerald-400">Ground-Truth MLOps Pipeline</div>
+              <div className="space-y-3 text-xs text-slate-300">
+                <div className="flex items-start gap-3">
+                  <div className="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold flex-shrink-0 text-[11px]">1</div>
+                  <p>Inference log saved with image, predicted class, and entropy score.</p>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold flex-shrink-0 text-[11px]">2</div>
+                  <p>All user uploads populate the certified agronomist review queue.</p>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold flex-shrink-0 text-[11px]">3</div>
+                  <p>Agronomist confirms or selects corrected disease class from 38 categories.</p>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold flex-shrink-0 text-[11px]">4</div>
+                  <p>Atlas & S3 sync relabeled metadata for automated trigger of PyTorch retrain job.</p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
+
+      {/* Footer */}
+      <footer className="py-8 bg-stone-950 text-slate-400 text-xs border-t border-stone-800">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-2">
+            <Sprout className="w-4 h-4 text-emerald-500" />
+            <span className="font-bold text-slate-300">AgriCloud-ML</span>
+            <span>— Serverless Plant Pathology Architecture</span>
+          </div>
+          <div className="text-[11px] text-slate-400">
+            Capstone Project BCSE497J • VIT Bhopal University
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }

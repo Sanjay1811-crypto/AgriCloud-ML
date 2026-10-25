@@ -1,21 +1,22 @@
 const Analysis = require('../models/Analysis');
 
-// @desc    Get dashboard metrics computed live from MongoDB for authenticated user
+// @desc    Get dashboard metrics computed live from MongoDB (personal for user, global for expert)
 // @route   GET /api/dashboard/stats
 const getStats = async (req, res, next) => {
   try {
-    const userId = req.user._id;
+    const isExpert = req.user.role === 'expert' || req.user.role === 'admin';
+    const filter = isExpert ? {} : { userId: req.user._id };
 
     const [totalAnalyses, healthyCount, diseasedCount, avgResult, statusBreakdown] = await Promise.all([
-      Analysis.countDocuments({ userId }),
-      Analysis.countDocuments({ userId, isHealthy: true }),
-      Analysis.countDocuments({ userId, isHealthy: false }),
+      Analysis.countDocuments(filter),
+      Analysis.countDocuments({ ...filter, isHealthy: true }),
+      Analysis.countDocuments({ ...filter, isHealthy: false }),
       Analysis.aggregate([
-        { $match: { userId } },
+        { $match: filter },
         { $group: { _id: null, avgConfidence: { $avg: '$confidence' } } }
       ]),
       Analysis.aggregate([
-        { $match: { userId } },
+        { $match: filter },
         { $group: { _id: '$reviewStatus', count: { $sum: 1 } } }
       ])
     ]);
@@ -39,6 +40,7 @@ const getStats = async (req, res, next) => {
     res.status(200).json({
       success: true,
       data: {
+        isExpertView: isExpert,
         totalAnalyses,
         diseasesDetected: diseasedCount,
         healthyPlants: healthyCount,
@@ -52,17 +54,21 @@ const getStats = async (req, res, next) => {
   }
 };
 
-// @desc    Get recent 5 analyses for authenticated user
+// @desc    Get recent 5 analyses (personal for user, latest submissions for expert)
 // @route   GET /api/dashboard/recent
 const getRecent = async (req, res, next) => {
   try {
-    const recent = await Analysis.find({ userId: req.user._id })
+    const isExpert = req.user.role === 'expert' || req.user.role === 'admin';
+    const filter = isExpert ? {} : { userId: req.user._id };
+
+    const recent = await Analysis.find(filter)
       .sort({ createdAt: -1 })
       .limit(5);
 
     res.status(200).json({
       success: true,
       count: recent.length,
+      isExpertView: isExpert,
       data: recent
     });
   } catch (err) {

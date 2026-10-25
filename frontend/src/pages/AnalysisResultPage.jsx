@@ -3,15 +3,18 @@ import { useParams, Link, useOutletContext } from 'react-router-dom';
 import Header from '../components/Header';
 import ConfidenceBadge from '../components/ConfidenceBadge';
 import RelabelModal from '../components/RelabelModal';
+import { useAuth } from '../context/AuthContext';
 import { 
   Sprout, CheckCircle, AlertTriangle, RefreshCw, ShieldCheck, 
-  HeartHandshake, FileText, ArrowLeft, Calendar, Layers
+  HeartHandshake, FileText, ArrowLeft, Calendar, Layers,
+  User, Check, Edit3, Award
 } from 'lucide-react';
 import api from '../services/api';
 
 export default function AnalysisResultPage() {
   const { id } = useParams();
   const { toggleSidebar } = useOutletContext();
+  const { user, isExpert } = useAuth();
   
   const [analysis, setAnalysis] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -41,10 +44,10 @@ export default function AnalysisResultPage() {
     try {
       const res = await api.put(`/analysis/${id}/review`, {
         reviewStatus: 'Confirmed',
-        reviewNotes: 'Verified diagnosis by agronomist.'
+        reviewNotes: 'Verified diagnosis confirmed by certified agronomist.'
       });
       setAnalysis(res.data.data);
-      setActionNotice('Prediction confirmed! Saved to retraining dataset.');
+      setActionNotice('Prediction confirmed! Saved to authoritative retraining dataset.');
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to confirm prediction.');
     } finally {
@@ -84,17 +87,89 @@ export default function AnalysisResultPage() {
   return (
     <div className="flex-1 flex flex-col">
       <Header onMenuClick={toggleSidebar} title="Pathology Diagnostic Report" subtitle={`Specimen ID: ${analysis._id}`} />
+      
       <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-6xl w-full mx-auto space-y-6">
-        <div className="flex items-center justify-between">
-          <Link to="/dashboard" className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-600 hover:text-slate-900">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <Link to={isExpert ? "/history" : "/dashboard"} className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-600 hover:text-slate-900">
             <ArrowLeft className="w-4 h-4" />
-            <span>Back to Dashboard</span>
+            <span>{isExpert ? "Back to Review Queue" : "Back to Dashboard"}</span>
           </Link>
           <div className="flex items-center gap-2 text-xs text-slate-500">
             <Calendar className="w-3.5 h-3.5" />
             <span>{new Date(analysis.createdAt).toLocaleString()}</span>
           </div>
         </div>
+
+        {/* Agronomist Review Info Banner for Experts */}
+        {isExpert && (
+          <div className="p-4 sm:p-5 rounded-2xl bg-slate-900 text-white shadow-soft flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border border-slate-800">
+            <div className="flex items-start gap-3.5">
+              <div className="w-10 h-10 rounded-xl bg-emerald-500/20 border border-emerald-400/30 flex items-center justify-center flex-shrink-0 text-emerald-400">
+                <User className="w-5 h-5" />
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-bold text-emerald-400 uppercase tracking-wider">Farmer Submission</span>
+                  <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                    analysis.reviewStatus === 'Confirmed' ? 'bg-emerald-500/30 text-emerald-300 border border-emerald-500/40' :
+                    analysis.reviewStatus === 'Corrected' ? 'bg-indigo-500/30 text-indigo-300 border border-indigo-500/40' :
+                    'bg-amber-500/30 text-amber-300 border border-amber-500/40'
+                  }`}>
+                    {analysis.reviewStatus}
+                  </span>
+                </div>
+                <div className="text-sm font-bold text-white mt-0.5">
+                  Uploaded by: {analysis.uploadedByName || 'Farmer'} <span className="text-xs text-slate-400 font-normal">({analysis.uploadedByEmail || 'user@agricloud.org'})</span>
+                </div>
+                {analysis.reviewedBy && (
+                  <div className="text-xs text-slate-400 mt-1">
+                    Reviewed by <strong>{analysis.reviewedByName || 'Agronomist'}</strong> on {new Date(analysis.reviewedAt || analysis.updatedAt).toLocaleString()}
+                    {analysis.reviewNotes && ` — "${analysis.reviewNotes}"`}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2.5 w-full md:w-auto">
+              <button
+                onClick={handleConfirm}
+                disabled={confirming || analysis.reviewStatus === 'Confirmed'}
+                className="flex-1 md:flex-none inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold shadow-sm transition-colors disabled:opacity-40"
+              >
+                <Check className="w-4 h-4" />
+                <span>{confirming ? 'Saving...' : analysis.reviewStatus === 'Confirmed' ? 'Confirmed' : 'Confirm Prediction'}</span>
+              </button>
+              <button
+                onClick={() => setModalOpen(true)}
+                className="flex-1 md:flex-none inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold shadow-sm transition-colors"
+              >
+                <Edit3 className="w-4 h-4" />
+                <span>Correct Label</span>
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Regular Farmer Diagnostic Status Notice */}
+        {!isExpert && analysis.reviewStatus !== 'Pending' && (
+          <div className={`p-4 rounded-2xl flex items-center gap-3 border shadow-sm ${
+            analysis.reviewStatus === 'Confirmed' 
+              ? 'bg-emerald-50 border-emerald-200 text-emerald-950'
+              : 'bg-indigo-50 border-indigo-200 text-indigo-950'
+          }`}>
+            <Award className={`w-6 h-6 flex-shrink-0 ${analysis.reviewStatus === 'Confirmed' ? 'text-emerald-700' : 'text-indigo-700'}`} />
+            <div>
+              <div className="text-xs font-bold uppercase tracking-wider">
+                {analysis.reviewStatus === 'Confirmed' ? 'Verified by Certified Agronomist' : 'Clinically Corrected by Agronomist'}
+              </div>
+              <div className="text-xs mt-0.5 leading-relaxed">
+                {analysis.reviewStatus === 'Confirmed' 
+                  ? `An agricultural pathologist reviewed this specimen and confirmed the diagnosis of ${analysis.predictedDisease}.`
+                  : `An agricultural pathologist corrected the automated diagnosis to "${analysis.correctedLabel}". Recommended treatments and prevention below have been updated accordingly.`}
+              </div>
+            </div>
+          </div>
+        )}
 
         {actionNotice && (
           <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-xs font-semibold text-emerald-800 flex items-center gap-2 shadow-sm">
@@ -143,10 +218,17 @@ export default function AnalysisResultPage() {
                   <ConfidenceBadge confidence={analysis.confidence} />
                 </div>
 
-                <div className="text-xs font-semibold text-slate-500">Primary Neural Prediction</div>
+                <div className="text-xs font-semibold text-slate-500">
+                  {analysis.correctedLabel ? 'Authoritative Expert Diagnosis' : 'Primary Neural Prediction'}
+                </div>
                 <h2 className="text-2xl sm:text-3xl font-black text-slate-950 mt-1 tracking-tight">
-                  {analysis.predictedDisease}
+                  {analysis.correctedLabel || analysis.predictedDisease}
                 </h2>
+                {analysis.correctedLabel && (
+                  <div className="text-xs text-indigo-700 font-semibold mt-1">
+                    Original AI classification: {analysis.predictedDisease}
+                  </div>
+                )}
 
                 <div className="mt-4 space-y-1.5">
                   <div className="flex items-center justify-between text-xs font-bold text-slate-700">
@@ -194,11 +276,12 @@ export default function AnalysisResultPage() {
                 </div>
               )}
 
+              {/* Status summary box */}
               <div className="p-4 rounded-xl bg-emerald-50/70 border border-emerald-200 flex flex-col sm:flex-row items-center justify-between gap-3">
                 <div>
                   <div className="text-xs font-bold text-emerald-950 flex items-center gap-1.5">
                     <RefreshCw className="w-3.5 h-3.5 text-emerald-700" />
-                    <span>Relabeling Workflow</span>
+                    <span>Agronomic Review Status</span>
                     <span className={`ml-2 px-2 py-0.5 rounded text-[10px] font-bold ${
                       analysis.reviewStatus === 'Confirmed' ? 'bg-emerald-200 text-emerald-900' :
                       analysis.reviewStatus === 'Corrected' ? 'bg-indigo-200 text-indigo-900' : 'bg-amber-200 text-amber-900'
@@ -208,26 +291,28 @@ export default function AnalysisResultPage() {
                   </div>
                   {analysis.correctedLabel && (
                     <div className="text-[11px] text-slate-600 mt-0.5">
-                      Expert Correction: <strong className="text-indigo-900">{analysis.correctedLabel}</strong>
+                      Verified Clinical Class: <strong className="text-indigo-900">{analysis.correctedLabel}</strong>
                     </div>
                   )}
                 </div>
 
-                <div className="flex items-center gap-2 w-full sm:w-auto">
-                  <button
-                    onClick={handleConfirm}
-                    disabled={confirming || analysis.reviewStatus === 'Confirmed'}
-                    className="flex-1 sm:flex-none px-3.5 py-2 rounded-lg bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold shadow-sm transition-colors disabled:opacity-50"
-                  >
-                    {confirming ? 'Saving...' : 'Confirm Prediction'}
-                  </button>
-                  <button
-                    onClick={() => setModalOpen(true)}
-                    className="flex-1 sm:flex-none px-3.5 py-2 rounded-lg bg-white hover:bg-stone-100 text-slate-800 border border-stone-300 text-xs font-bold shadow-sm transition-colors"
-                  >
-                    Correct Label
-                  </button>
-                </div>
+                {isExpert && (
+                  <div className="flex items-center gap-2 w-full sm:w-auto">
+                    <button
+                      onClick={handleConfirm}
+                      disabled={confirming || analysis.reviewStatus === 'Confirmed'}
+                      className="flex-1 sm:flex-none px-3.5 py-2 rounded-lg bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold shadow-sm transition-colors disabled:opacity-50"
+                    >
+                      {confirming ? 'Saving...' : 'Confirm'}
+                    </button>
+                    <button
+                      onClick={() => setModalOpen(true)}
+                      className="flex-1 sm:flex-none px-3.5 py-2 rounded-lg bg-white hover:bg-stone-100 text-slate-800 border border-stone-300 text-xs font-bold shadow-sm transition-colors"
+                    >
+                      Correct Label
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -287,7 +372,7 @@ export default function AnalysisResultPage() {
       <RelabelModal
         isOpen={modalOpen}
         onClose={() => setModalOpen(false)}
-        currentLabel={analysis.predictedLabel}
+        currentLabel={analysis.predictedLabel || analysis.predictedDisease}
         analysisId={analysis._id}
         onUpdated={(updated) => {
           setAnalysis(updated);

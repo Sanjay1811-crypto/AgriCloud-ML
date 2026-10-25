@@ -26,8 +26,8 @@ export const AuthProvider = ({ children }) => {
     loadUser();
   }, []);
 
-  const login = async (email, password) => {
-    const res = await api.post('/auth/login', { email, password });
+  const login = async (email, password, portalType = 'user') => {
+    const res = await api.post('/auth/login', { email, password, portalType });
     const { token: jwtToken, user: userData } = res.data;
     localStorage.setItem('agricloud_token', jwtToken);
     localStorage.setItem('agricloud_user', JSON.stringify(userData));
@@ -36,8 +36,8 @@ export const AuthProvider = ({ children }) => {
     return userData;
   };
 
-  const signup = async (name, email, password) => {
-    const res = await api.post('/auth/signup', { name, email, password });
+  const signup = async (name, email, password, role = 'user') => {
+    const res = await api.post('/auth/signup', { name, email, password, role });
     const { token: jwtToken, user: userData } = res.data;
     localStorage.setItem('agricloud_token', jwtToken);
     localStorage.setItem('agricloud_user', JSON.stringify(userData));
@@ -53,8 +53,19 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
   };
 
+  const isExpert = user?.role === 'expert' || user?.role === 'admin';
+
   return (
-    <AuthContext.Provider value={{ user, token, loading, login, signup, logout, isAuthenticated: !!token }}>
+    <AuthContext.Provider value={{ 
+      user, 
+      token, 
+      loading, 
+      login, 
+      signup, 
+      logout, 
+      isAuthenticated: !!token,
+      isExpert
+    }}>
       {children}
     </AuthContext.Provider>
   );

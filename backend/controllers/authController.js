@@ -7,11 +7,11 @@ const signToken = (id) => {
   });
 };
 
-// @desc    Register a new user
+// @desc    Register a new user (Farmer or Agronomy Expert)
 // @route   POST /api/auth/signup
 const signup = async (req, res, next) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, role } = req.body;
 
     if (!name || !email || !password) {
       return res.status(400).json({
@@ -35,17 +35,21 @@ const signup = async (req, res, next) => {
       });
     }
 
+    // Role assignment: 'expert' or 'user' (default 'user')
+    const assignedRole = role === 'expert' ? 'expert' : 'user';
+
     const user = await User.create({
       name,
       email: email.toLowerCase(),
-      password
+      password,
+      role: assignedRole
     });
 
     const token = signToken(user._id);
 
     res.status(201).json({
       success: true,
-      message: 'Account registered successfully.',
+      message: `Account registered successfully as ${assignedRole === 'expert' ? 'Agronomy Expert' : 'Farmer / User'}.`,
       token,
       user: {
         id: user._id,
@@ -59,11 +63,11 @@ const signup = async (req, res, next) => {
   }
 };
 
-// @desc    Authenticate user & get token
+// @desc    Authenticate user & get token (with optional portal validation)
 // @route   POST /api/auth/login
 const login = async (req, res, next) => {
   try {
-    const { email, password } = req.body;
+    const { email, password, portalType } = req.body;
 
     if (!email || !password) {
       return res.status(400).json({
@@ -77,6 +81,14 @@ const login = async (req, res, next) => {
       return res.status(401).json({
         success: false,
         message: 'Invalid email or password.'
+      });
+    }
+
+    // Portal-specific verification
+    if (portalType === 'expert' && user.role !== 'expert' && user.role !== 'admin') {
+      return res.status(403).json({
+        success: false,
+        message: 'Access Restricted: This portal is reserved for certified Agronomists and Pathology Experts. Please sign in through the Farmer / User portal or create an Expert account.'
       });
     }
 
@@ -113,10 +125,10 @@ const getMe = async (req, res, next) => {
 
 // @desc    Logout user (stateless JWT client cleanup)
 // @route   POST /api/auth/logout
-const logout = async (req, res) => {
+const logout = (req, res) => {
   res.status(200).json({
     success: true,
-    message: 'Logged out successfully.'
+    message: 'User logged out successfully.'
   });
 };
 

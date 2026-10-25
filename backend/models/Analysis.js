@@ -18,6 +18,8 @@ const analysisSchema = new mongoose.Schema(
       required: true,
       index: true
     },
+    uploadedByName: { type: String, default: 'Farmer' },
+    uploadedByEmail: { type: String, default: '' },
     originalFilename: { type: String, required: true },
     fileType: { type: String, required: true },
     fileSize: { type: Number, required: true },
@@ -54,6 +56,8 @@ const analysisSchema = new mongoose.Schema(
       index: true
     },
     reviewNotes: { type: String, default: '' },
+    reviewedBy: { type: mongoose.Schema.Types.Mixed, default: null },
+    reviewedByName: { type: String, default: null },
     reviewedAt: { type: Date, default: null }
   },
   { timestamps: true }

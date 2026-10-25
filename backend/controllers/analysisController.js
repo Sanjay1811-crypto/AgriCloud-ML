@@ -58,6 +58,8 @@ const createAnalysis = async (req, res, next) => {
 
     const analysis = await Analysis.create({
       userId: req.user._id,
+      uploadedByName: req.user.name || 'Farmer',
+      uploadedByEmail: req.user.email || '',
       originalFilename: originalname,
       fileType: mimetype,
       fileSize: size,
@@ -99,19 +101,28 @@ const createAnalysis = async (req, res, next) => {
   }
 };
 
-// @desc    Get user's analysis history with search, filters, and pagination
+// @desc    Get user's analysis history or all submissions for experts
 // @route   GET /api/analysis
 const getAnalyses = async (req, res, next) => {
   try {
     const { search, crop, status, sortBy = 'createdAt', sortOrder = 'desc', page = 1, limit = 10 } = req.query;
 
-    const query = { userId: req.user._id };
+    const query = {};
+
+    // STRICT USER DATA ISOLATION:
+    // Regular users can only see their own analyses.
+    // Certified Experts and Admins can see ALL user-uploaded specimens across the system.
+    if (req.user.role !== 'expert' && req.user.role !== 'admin') {
+      query.userId = req.user._id;
+    }
 
     if (search) {
       query.$or = [
         { plantName: { $regex: search, $options: 'i' } },
         { predictedDisease: { $regex: search, $options: 'i' } },
-        { originalFilename: { $regex: search, $options: 'i' } }
+        { originalFilename: { $regex: search, $options: 'i' } },
+        { uploadedByName: { $regex: search, $options: 'i' } },
+        { uploadedByEmail: { $regex: search, $options: 'i' } }
       ];
     }
 
@@ -140,7 +151,7 @@ const getAnalyses = async (req, res, next) => {
       total,
       page: pageNum,
       totalPages: Math.ceil(total / limitNum),
-      count: items.length,
+      isExpertView: req.user.role === 'expert' || req.user.role === 'admin',
       data: items
     });
   } catch (err) {
@@ -148,7 +159,7 @@ const getAnalyses = async (req, res, next) => {
   }
 };
 
-// @desc    Get single analysis by ID (Enforces User Data Isolation)
+// @desc    Get single analysis record by ID
 // @route   GET /api/analysis/:id
 const getAnalysisById = async (req, res, next) => {
   try {
@@ -161,8 +172,9 @@ const getAnalysisById = async (req, res, next) => {
       });
     }
 
-    // STRICT USER DATA ISOLATION
-    if (analysis.userId.toString() !== req.user._id.toString() && req.user.role !== 'admin') {
+    // Regular users can only access their own analyses.
+    // Experts and Admins can view any submission for pathology validation.
+    if (analysis.userId.toString() !== req.user._id.toString() && req.user.role !== 'admin' && req.user.role !== 'expert') {
       return res.status(403).json({
         success: false,
         message: 'Access denied. You do not have permission to view this analysis record.'
@@ -178,7 +190,7 @@ const getAnalysisById = async (req, res, next) => {
   }
 };
 
-// @desc    Submit Relabeling Review (Confirm Prediction or Correct Label)
+// @desc    Submit Relabeling Review (Confirm Prediction or Correct Label by Expert / User)
 // @route   PUT /api/analysis/:id/review
 const updateReview = async (req, res, next) => {
   try {
@@ -200,41 +212,44 @@ const updateReview = async (req, res, next) => {
       });
     }
 
-    // User ownership check
-    if (analysis.userId.toString() !== req.user._id.toString() && req.user.role !== 'admin') {
+    // Permission check: Owner or Certified Expert or Admin
+    if (analysis.userId.toString() !== req.user._id.toString() && req.user.role !== 'admin' && req.user.role !== 'expert') {
       return res.status(403).json({
         success: false,
-        message: 'Access denied.'
+        message: 'Access denied. You do not have permission to review this analysis record.'
       });
     }
 
     analysis.reviewStatus = reviewStatus;
+    analysis.reviewedBy = req.user._id;
+    analysis.reviewedByName = req.user.name;
+    analysis.reviewedAt = new Date();
+
+    if (reviewNotes !== undefined) {
+      analysis.reviewNotes = reviewNotes;
+    }
+
     if (reviewStatus === 'Corrected' && correctedLabel) {
       analysis.correctedLabel = correctedLabel;
-      // Also update curation information for the corrected label
+      // Retrieve updated botanical curation information for corrected label
       const newCuration = getCureByClass(correctedLabel);
       if (newCuration) {
         analysis.cause = newCuration.cause;
         analysis.symptoms = newCuration.symptoms;
         analysis.treatment = newCuration.treatment;
         analysis.prevention = newCuration.prevention;
-        analysis.isHealthy = newCuration.isHealthy;
+        analysis.isHealthy = newCuration.isHealthy || false;
         analysis.plantName = newCuration.crop;
       }
     } else if (reviewStatus === 'Confirmed') {
-      analysis.correctedLabel = analysis.predictedLabel;
+      analysis.correctedLabel = analysis.predictedLabel || analysis.predictedDisease;
     }
 
-    if (reviewNotes !== undefined) {
-      analysis.reviewNotes = reviewNotes;
-    }
-
-    analysis.reviewedAt = new Date();
     await analysis.save();
 
     res.status(200).json({
       success: true,
-      message: `Analysis review successfully recorded as ${reviewStatus}.`,
+      message: `Analysis review successfully recorded as ${reviewStatus} by ${req.user.role === 'expert' ? 'Agronomist ' + req.user.name : 'User'}.`,
       data: analysis
     });
   } catch (err) {
@@ -255,11 +270,11 @@ const deleteAnalysis = async (req, res, next) => {
       });
     }
 
-    // User ownership check
+    // User ownership or Admin check
     if (analysis.userId.toString() !== req.user._id.toString() && req.user.role !== 'admin') {
       return res.status(403).json({
         success: false,
-        message: 'Access denied.'
+        message: 'Access denied. Only the author or administrator can delete this record.'
       });
     }
 
@@ -280,37 +295,46 @@ const deleteAnalysis = async (req, res, next) => {
 const exportRelabeledData = async (req, res, next) => {
   try {
     const format = req.query.format || 'json';
-    const analyses = await Analysis.find({
-      userId: req.user._id,
+
+    // Experts/Admins export all reviewed records across the platform; Users export their own
+    const query = {
       reviewStatus: { $in: ['Confirmed', 'Corrected'] }
-    });
+    };
+    if (req.user.role !== 'expert' && req.user.role !== 'admin') {
+      query.userId = req.user._id;
+    }
+
+    const analyses = await Analysis.find(query);
 
     if (format === 'csv') {
-      let csv = 'ID,Filename,PredictedLabel,CorrectedLabel,ReviewStatus,Confidence,ReviewedAt\n';
+      let csv = 'ID,UploadedBy,Filename,PredictedLabel,CorrectedLabel,ReviewStatus,Confidence,ReviewedBy,ReviewedAt\n';
       analyses.forEach(item => {
-        csv += `"${item._id}","${item.originalFilename}","${item.predictedLabel}","${item.correctedLabel || ''}","${item.reviewStatus}",${item.confidence},"${item.reviewedAt || ''}"\n`;
+        csv += `"${item._id}","${item.uploadedByName || ''}","${item.originalFilename}","${item.predictedLabel}","${item.correctedLabel || ''}","${item.reviewStatus}",${item.confidence},"${item.reviewedByName || ''}","${item.reviewedAt || ''}"\n`;
       });
       res.setHeader('Content-Type', 'text/csv');
       res.setHeader('Content-Disposition', 'attachment; filename="agricloud_relabel_dataset.csv"');
       return res.send(csv);
     }
 
-    // Standard COCO / MLOps format
+    // Standard COCO / MLOps dataset format
     const cocoExport = {
       info: {
-        description: 'AgriCloud-ML Expert Relabeled Dataset',
-        version: '1.0',
+        description: 'AgriCloud-ML Expert Relabeled Dataset for Continuous Cloud Retraining',
+        version: '2.0',
         year: new Date().getFullYear(),
-        contributor: req.user.name
+        contributor: req.user.name,
+        exporterRole: req.user.role
       },
       annotations: analyses.map((a, idx) => ({
         id: idx + 1,
         image_id: a._id,
+        uploader: a.uploadedByName || 'Unknown',
         filename: a.originalFilename,
         image_url: a.displayImageUrl,
         predicted_label: a.predictedLabel,
         corrected_label: a.correctedLabel || a.predictedLabel,
         review_status: a.reviewStatus,
+        reviewed_by: a.reviewedByName || null,
         confidence: a.confidence,
         model_version: a.modelVersion,
         reviewed_at: a.reviewedAt

@@ -8,13 +8,14 @@ import {
   LogOut, 
   Sprout, 
   Cloud,
-  ChevronRight,
-  Database
+  Microscope,
+  ShieldCheck,
+  FileCheck
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 export default function Sidebar({ isOpen, onClose }) {
-  const { user, logout } = useAuth();
+  const { user, logout, isExpert } = useAuth();
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -22,10 +23,14 @@ export default function Sidebar({ isOpen, onClose }) {
     navigate('/login');
   };
 
-  const navItems = [
-    { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
-    { name: 'New Analysis', path: '/analysis/new', icon: PlusCircle, highlight: true },
-    { name: 'Analysis History', path: '/history', icon: History },
+  const navItems = isExpert ? [
+    { name: 'Expert Dashboard', path: '/dashboard', icon: LayoutDashboard },
+    { name: 'All User Submissions', path: '/history', icon: FileCheck, highlight: true, badge: 'Review Queue' },
+    { name: 'Profile & Settings', path: '/profile', icon: User },
+  ] : [
+    { name: 'Farmer Dashboard', path: '/dashboard', icon: LayoutDashboard },
+    { name: 'New Plant Analysis', path: '/analysis/new', icon: PlusCircle, highlight: true, badge: 'Run' },
+    { name: 'My Diagnosis History', path: '/history', icon: History },
     { name: 'Profile & Settings', path: '/profile', icon: User },
   ];
 
@@ -45,27 +50,40 @@ export default function Sidebar({ isOpen, onClose }) {
         {/* Brand Header */}
         <div className="h-16 flex items-center justify-between px-5 border-b border-slate-800">
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-700 flex items-center justify-center shadow-md shadow-emerald-950">
-              <Sprout className="w-5 h-5 text-white" />
+            <div className={`w-9 h-9 rounded-xl flex items-center justify-center shadow-md ${
+              isExpert ? 'bg-gradient-to-br from-indigo-500 to-purple-800 shadow-indigo-950' : 'bg-gradient-to-br from-emerald-500 to-teal-700 shadow-emerald-950'
+            }`}>
+              {isExpert ? <Microscope className="w-5 h-5 text-white" /> : <Sprout className="w-5 h-5 text-white" />}
             </div>
             <div>
-              <div className="font-bold text-white tracking-tight text-base">AgriCloud<span className="text-emerald-400">-ML</span></div>
-              <div className="text-[10px] text-slate-400 font-mono">PyTorch EfficientNet-B0</div>
+              <div className="font-bold text-white tracking-tight text-base">AgriCloud<span className={isExpert ? "text-indigo-400" : "text-emerald-400"}>-ML</span></div>
+              <div className="text-[10px] text-slate-400 font-mono">
+                {isExpert ? 'Expert Pathology Review' : 'PyTorch EfficientNet-B0'}
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Cloud Architecture status banner */}
+        {/* Role status badge */}
         <div className="mx-4 my-3 p-3 rounded-xl bg-slate-800/80 border border-slate-700/60">
-          <div className="flex items-center gap-2 text-xs font-semibold text-emerald-400 mb-1">
-            <Cloud className="w-3.5 h-3.5" />
-            <span>AWS Serverless Pipeline</span>
+          <div className="flex items-center gap-2 text-xs font-semibold mb-1">
+            {isExpert ? (
+              <span className="flex items-center gap-1.5 text-indigo-400">
+                <ShieldCheck className="w-3.5 h-3.5" />
+                <span>Certified Agronomist Mode</span>
+              </span>
+            ) : (
+              <span className="flex items-center gap-1.5 text-emerald-400">
+                <Cloud className="w-3.5 h-3.5" />
+                <span>Farmer / Grower Mode</span>
+              </span>
+            )}
           </div>
           <div className="text-[11px] text-slate-400 flex items-center justify-between">
-            <span>Accuracy: <strong className="text-slate-200">98.72%</strong></span>
+            <span>{isExpert ? 'Scope: Global Submissions' : 'Scope: Personal Farm'}</span>
             <span className="flex items-center gap-1">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-              Live
+              <span className={`w-2 h-2 rounded-full ${isExpert ? 'bg-indigo-500' : 'bg-emerald-500'} animate-pulse`}></span>
+              Online
             </span>
           </div>
         </div>
@@ -81,19 +99,21 @@ export default function Sidebar({ isOpen, onClose }) {
                 onClick={onClose}
                 className={({ isActive }) => `flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all ${
                   isActive 
-                    ? 'bg-emerald-600 text-white font-semibold shadow-md shadow-emerald-900/30' 
+                    ? isExpert ? 'bg-indigo-600 text-white font-semibold shadow-md shadow-indigo-900/30' : 'bg-emerald-600 text-white font-semibold shadow-md shadow-emerald-900/30'
                     : item.highlight
-                    ? 'bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 border border-emerald-500/30'
+                    ? isExpert ? 'bg-indigo-500/10 text-indigo-300 hover:bg-indigo-500/20 border border-indigo-500/30' : 'bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 border border-emerald-500/30'
                     : 'text-slate-300 hover:bg-slate-800 hover:text-white'
                 }`}
               >
                 <div className="flex items-center gap-3">
-                  <Icon className={`w-4 h-4 ${item.highlight ? 'text-emerald-400' : ''}`} />
+                  <Icon className={`w-4 h-4 ${item.highlight ? (isExpert ? 'text-indigo-400' : 'text-emerald-400') : ''}`} />
                   <span>{item.name}</span>
                 </div>
-                {item.highlight && (
-                  <span className="text-[10px] uppercase font-bold bg-emerald-400/20 text-emerald-300 px-1.5 py-0.5 rounded">
-                    Run
+                {item.badge && (
+                  <span className={`text-[10px] uppercase font-bold px-1.5 py-0.5 rounded ${
+                    isExpert ? 'bg-indigo-400/20 text-indigo-300' : 'bg-emerald-400/20 text-emerald-300'
+                  }`}>
+                    {item.badge}
                   </span>
                 )}
               </NavLink>
@@ -104,12 +124,16 @@ export default function Sidebar({ isOpen, onClose }) {
         {/* User Card & Logout */}
         <div className="p-3 border-t border-slate-800 bg-slate-950/50">
           <div className="flex items-center gap-3 px-2 py-2 mb-2 rounded-lg bg-slate-900">
-            <div className="w-8 h-8 rounded-full bg-emerald-700 flex items-center justify-center font-bold text-xs text-white uppercase">
+            <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs text-white uppercase ${
+              isExpert ? 'bg-indigo-700' : 'bg-emerald-700'
+            }`}>
               {user?.name ? user.name.substring(0, 2) : 'AG'}
             </div>
             <div className="flex-1 min-w-0">
-              <div className="text-xs font-semibold text-white truncate">{user?.name || 'Researcher'}</div>
-              <div className="text-[10px] text-slate-400 truncate">{user?.email || 'authenticated'}</div>
+              <div className="text-xs font-semibold text-white truncate">{user?.name || 'User'}</div>
+              <div className="text-[10px] text-slate-400 truncate">
+                {isExpert ? '🔬 Pathology Expert' : '🌿 Farmer'}
+              </div>
             </div>
           </div>
 

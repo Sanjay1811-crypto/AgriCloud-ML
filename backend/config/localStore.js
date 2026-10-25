@@ -58,12 +58,14 @@ class LocalUser {
         return this;
       },
       then(resolve) { resolve(doc); },
-      catch(reject) {}
+      catch(reject) { /* no-op */ }
     };
   }
 
-  static findById(id) {
-    return this.findOne({ _id: id });
+  static async findById(id) {
+    const db = readDB();
+    const found = db.users.find(u => u._id.toString() === id.toString());
+    return found ? this._wrap(found) : null;
   }
 
   static _wrap(raw) {
@@ -93,6 +95,8 @@ class LocalAnalysis {
     const doc = {
       _id: 'anl_' + Date.now() + Math.random().toString(36).substring(2, 7),
       ...data,
+      uploadedByName: data.uploadedByName || 'Farmer',
+      uploadedByEmail: data.uploadedByEmail || '',
       reviewStatus: data.reviewStatus || 'Pending',
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
@@ -115,6 +119,8 @@ class LocalAnalysis {
           if (clause.plantName && new RegExp(clause.plantName.$regex, 'i').test(item.plantName)) return true;
           if (clause.predictedDisease && new RegExp(clause.predictedDisease.$regex, 'i').test(item.predictedDisease)) return true;
           if (clause.originalFilename && new RegExp(clause.originalFilename.$regex, 'i').test(item.originalFilename)) return true;
+          if (clause.uploadedByName && new RegExp(clause.uploadedByName.$regex, 'i').test(item.uploadedByName)) return true;
+          if (clause.uploadedByEmail && new RegExp(clause.uploadedByEmail.$regex, 'i').test(item.uploadedByEmail)) return true;
           return false;
         });
         if (!matches) return false;
@@ -169,6 +175,7 @@ class LocalAnalysis {
         const m = stage.$match;
         items = items.filter(it => {
           if (m.userId && it.userId.toString() !== m.userId.toString()) return false;
+          if (m.isHealthy !== undefined && it.isHealthy !== m.isHealthy) return false;
           return true;
         });
       } else if (stage.$group) {
