@@ -1,4 +1,4 @@
-# 38 PlantVillage Classes Mapping
+# 38 PlantVillage Classes Mapping (Default taxonomy)
 CLASS_NAMES = [
     "Apple___Apple_scab",
     "Apple___Black_rot",
@@ -41,6 +41,9 @@ CLASS_NAMES = [
 ]
 
 def parse_class_label(raw_label: str):
+    if "non_leaf" in raw_label.lower() or "unknown" in raw_label.lower() or "background" in raw_label.lower():
+        return "Unknown", "Non-Leaf or Unknown Object"
+
     parts = raw_label.split("___")
     crop_raw = parts[0]
     disease_raw = parts[1] if len(parts) > 1 else "Unknown"

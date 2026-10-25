@@ -42,6 +42,13 @@ pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
 pip install -r requirements.txt
 deactivate
 
+# Ensure trained weights are present in model/
+if [ ! -f "$APP_DIR/model/model.pth" ] && [ ! -f "$APP_DIR/model/plant_disease_efficientnet_b0.pth" ]; then
+    echo "--> Downloading fine-tuned PlantVillage EfficientNet-B0 model weights (99.56% accuracy)..."
+    curl -L "https://huggingface.co/tahmidalbi/agroscan-efficientnet-b0/resolve/main/agroscan_efficientnet_b0.pth" -o "$APP_DIR/model/model.pth"
+    curl -L "https://huggingface.co/tahmidalbi/agroscan-efficientnet-b0/resolve/main/labels.json" -o "$APP_DIR/model/labels.json"
+fi
+
 # 5. Setup Backend
 echo "--> Setting up Backend..."
 cd "$APP_DIR/backend"

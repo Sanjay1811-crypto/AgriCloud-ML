@@ -41,6 +41,14 @@ const createAnalysis = async (req, res, next) => {
     // 3. Run EfficientNet-B0 Inference
     const prediction = await predictDisease(inferenceImageBuffer, originalname);
 
+    // Guardrail: reject non-plant / out-of-distribution uploads
+    if (prediction.isPlant === false) {
+      return res.status(400).json({
+        success: false,
+        message: prediction.rejectionReason || 'No botanical plant leaf detected in the uploaded image. Please upload a clear photo of a crop leaf.'
+      });
+    }
+
     // 4. Retrieve structured disease curation information from cures.json
     const curation = getCureByClass(prediction.rawClass || prediction.disease);
 
