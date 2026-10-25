@@ -81,6 +81,12 @@ const createAnalysis = async (req, res, next) => {
       data: analysis
     });
   } catch (err) {
+    if (err.isPlantError || err.statusCode === 400) {
+      return res.status(400).json({
+        success: false,
+        message: err.message
+      });
+    }
     next(err);
   }
 };

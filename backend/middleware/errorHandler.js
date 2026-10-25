@@ -1,7 +1,7 @@
 const errorHandler = (err, req, res, next) => {
   console.error('[Error Handler]', err);
 
-  let statusCode = res.statusCode === 200 ? 500 : res.statusCode;
+  let statusCode = err.statusCode || (res.statusCode === 200 ? 500 : res.statusCode);
   let message = err.message || 'Internal Server Error';
 
   if (err.name === 'CastError') {
@@ -20,6 +20,9 @@ const errorHandler = (err, req, res, next) => {
     } else {
       message = `Upload error: ${err.message}`;
     }
+  } else if (err.isPlantError) {
+    statusCode = 400;
+    message = err.message;
   }
 
   res.status(statusCode).json({

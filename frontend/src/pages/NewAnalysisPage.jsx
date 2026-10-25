@@ -223,11 +223,17 @@ export default function NewAnalysisPage() {
 
         <div className="p-4 sm:p-5 rounded-2xl bg-emerald-50/50 border border-emerald-200 text-xs text-emerald-950 flex items-start gap-3.5">
           <Info className="w-5 h-5 text-emerald-700 flex-shrink-0 mt-0.5" />
-          <div className="space-y-1">
-            <span className="font-bold">ML Pipeline Specification:</span>
+          <div className="space-y-2">
+            <div className="flex items-center justify-between flex-wrap gap-2">
+              <span className="font-bold">Supported Crops & Botanical Guardrail:</span>
+              <span className="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full">38 Classes • 14 Crops</span>
+            </div>
             <p className="text-slate-600 leading-relaxed text-[11px]">
-              Uploaded files are mapped to PyTorch EfficientNet-B0 with 224x224 input sizing and ImageNet normalization. 
-              The botanical curation knowledge is retrieved from <code className="bg-emerald-100 px-1 py-0.5 rounded text-emerald-900">cures.json</code> independently of the model weights, allowing treatment updates without retraining.
+              AgriCloud-ML evaluates botanical foliar contours and chlorophyll spectral profiles for:
+              <strong className="text-slate-700"> Apple, Blueberry, Cherry, Corn, Grape, Orange, Peach, Bell Pepper, Potato, Raspberry, Soybean, Squash, Strawberry, and Tomato</strong>.
+            </p>
+            <p className="text-slate-500 leading-relaxed text-[11px]">
+              <em>Note:</em> To prevent erroneous diagnoses, our Out-Of-Distribution (OOD) filter automatically detects and rejects non-plant images (vehicles, faces, furniture, or non-botanical objects).
             </p>
           </div>
         </div>

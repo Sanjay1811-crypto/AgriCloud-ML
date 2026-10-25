@@ -6,7 +6,7 @@ from app.classes import CLASS_NAMES
 
 app = FastAPI(
     title="AgriCloud-ML Pathology Inference Service",
-    description="EfficientNet-B0 Plant Disease Inference Service for 38 PlantVillage Classes",
+    description="EfficientNet-B0 Plant Disease Inference Service for 38 PlantVillage Classes with OOD Foliage Validation",
     version="1.0.0"
 )
 
@@ -26,7 +26,7 @@ def load_model_instance():
     global pathology_model
     try:
         pathology_model = PlantPathologyModel(MODEL_PATH)
-        print("[ML Service] EfficientNet-B0 inference engine initialized.")
+        print("[ML Service] EfficientNet-B0 inference engine initialized with OOD guardrail.")
     except Exception as e:
         print(f"[ML Service] Startup notice: {e}")
 
@@ -58,6 +58,13 @@ async def predict_plant_disease(file: UploadFile = File(...)):
 
     try:
         prediction = pathology_model.predict(contents, top_k=3)
+        if not prediction.get("isPlant", True):
+            raise HTTPException(
+                status_code=422,
+                detail=prediction.get("rejectionReason", "No plant leaf detected. Please upload a clear photo of a crop leaf.")
+            )
         return prediction
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Inference error: {str(e)}")
